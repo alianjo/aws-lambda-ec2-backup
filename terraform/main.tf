@@ -1,9 +1,9 @@
 resource "aws_lambda_function" "ec2_backup" {
-  function_name = var.lambda_function_name
-  handler       = "handler.lambda_handler"
-  runtime       = "python3.8"
-  role          = aws_iam_role.lambda_exec.arn
-  filename      = "lambda_function.zip"
+  function_name    = var.lambda_function_name
+  handler          = "handler.lambda_handler"
+  runtime          = "python3.8"
+  role             = aws_iam_role.lambda_exec.arn
+  filename         = "lambda_function.zip"
   source_code_hash = filebase64sha256("lambda_function.zip")
 
   environment {
