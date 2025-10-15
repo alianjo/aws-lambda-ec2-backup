@@ -51,13 +51,15 @@ jobs:
       - name: Package Lambda Function
         id: package-lambda
         run: |
-          # Make the package script executable and run it
-          chmod +x package_lambda.sh
-          ./package_lambda.sh
-          # Move the zip file to the terraform directory
-          mv lambda_function.zip terraform/
+          # Create the zip file directly
+          cd src
+          zip -r ../lambda_function.zip .
           # Verify the zip file was created
-          ls -la terraform/lambda_function.zip
+          ls -la ../lambda_function.zip
+          # Move to terraform directory
+          mv ../lambda_function.zip ../terraform/
+          # Verify it's in the right place
+          ls -la ../terraform/lambda_function.zip
 
       - name: Terraform Validate
         id: validate
@@ -75,12 +77,14 @@ jobs:
 
       - name: Deploy to AWS
         if: github.ref == 'refs/heads/main'
+        needs: [package-lambda]  # Ensure package step runs first
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: us-east-1
         run: |
           # Print current directory and list files for debugging
+          echo "Current directory:"
           pwd
           ls -la
           
@@ -91,8 +95,12 @@ jobs:
           echo "Files in terraform directory:"
           ls -la
           
+          # Verify lambda_function.zip exists and has content
+          echo "Lambda zip file details:"
+          ls -lh lambda_function.zip
+          
           # Initialize Terraform
           terraform init
           
           # Apply Terraform configuration
-          terraform apply -auto-approve
+          terraform apply -auto-approvee
