@@ -77,7 +77,6 @@ jobs:
 
       - name: Deploy to AWS
         if: github.ref == 'refs/heads/main'
-        needs: [package-lambda]  # Ensure package step runs first
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -103,4 +102,4 @@ jobs:
           terraform init
           
           # Apply Terraform configuration
-          terraform apply -auto-approvee
+          terraform apply -auto-approve
