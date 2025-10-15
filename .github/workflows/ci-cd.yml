@@ -56,13 +56,20 @@ jobs:
           zip -r ../terraform/lambda_function.zip .
           cd ../terraform
           ls -la lambda_function.zip
-          rm lambda_function.zip
 
       - name: Terraform Validate
         id: validate
         run: |
           cd terraform
           terraform validate -no-color
+          
+      - name: Cleanup Lambda Package
+        if: always()
+        run: |
+          # Remove the zip file after validation
+          if [ -f terraform/lambda_function.zip ]; then
+            rm terraform/lambda_function.zip
+          fi
 
       - name: Deploy to AWS
         if: github.ref == 'refs/heads/main'
