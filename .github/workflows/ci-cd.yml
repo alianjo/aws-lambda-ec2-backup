@@ -95,4 +95,4 @@ jobs:
           terraform init
           
           # Apply Terraform configuration
-          terraform apply -auto-approv
+          terraform apply -auto-approve
