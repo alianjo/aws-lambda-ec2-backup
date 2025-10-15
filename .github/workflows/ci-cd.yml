@@ -48,6 +48,16 @@ jobs:
           cd terraform
           terraform init
 
+      - name: Package Lambda Function
+        id: package-lambda
+        run: |
+          # Create the zip file with the Lambda function code
+          cd src
+          zip -r ../terraform/lambda_function.zip .
+          cd ../terraform
+          ls -la lambda_function.zip
+          rm lambda_function.zip
+
       - name: Terraform Validate
         id: validate
         run: |
