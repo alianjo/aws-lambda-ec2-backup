@@ -67,14 +67,6 @@ jobs:
           cd terraform
           terraform validate -no-color
           
-      - name: Cleanup Lambda Package
-        if: always()
-        run: |
-          # Remove the zip file after validation
-          if [ -f terraform/lambda_function.zip ]; then
-            rm terraform/lambda_function.zip
-          fi
-
       - name: Deploy to AWS
         if: github.ref == 'refs/heads/main'
         env:
@@ -82,19 +74,18 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: us-east-1
         run: |
-          # Print current directory and list files for debugging
+          # Create the zip file directly in the terraform directory
+          cd src
+          zip -r ../terraform/lambda_function.zip .
+          
+          # Go to terraform directory
+          cd ../terraform
+          
+          # Verify the zip file was created
           echo "Current directory:"
           pwd
           ls -la
           
-          # Go to terraform directory
-          cd terraform
-          
-          # List files in terraform directory
-          echo "Files in terraform directory:"
-          ls -la
-          
-          # Verify lambda_function.zip exists and has content
           echo "Lambda zip file details:"
           ls -lh lambda_function.zip
           
@@ -103,3 +94,6 @@ jobs:
           
           # Apply Terraform configuration
           terraform apply -auto-approve
+          
+          # Clean up the zip file after deployment
+          rm -f lambda_function.zip
